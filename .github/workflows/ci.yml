@@ -5,8 +5,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: production
 
     steps:
       - uses: actions/checkout@v2
@@ -22,3 +24,16 @@ jobs:
         run: |
           docker build . --tag ghcr.io/tjarkko/ibrew-api:latest
           docker push ghcr.io/tjarkko/ibrew-api:latest
+
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Build and deploy Container App
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          imageToDeploy: ghcr.io/tjarkko/ibrew-api:latest
+          resourceGroup: ${{ vars.AZURE_RESOURCE_GROUP }}
+          containerAppName: ${{ vars.AZURE_CONTAINER_APP_NAME }}
+          location: ${{ vars.AZURE_LOCATION }}
