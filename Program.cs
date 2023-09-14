@@ -1,4 +1,46 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
+
+
 var builder = WebApplication.CreateBuilder(args);
+
+/*builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            //IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(accessTokenSecret)),
+            //ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            //ValidAudience = builder.Configuration["Jwt:Audience"],
+            //ValidateIssuerSigningKey = true,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+        options.SaveToken = true;
+    });*/
+
+builder.Services.AddAuthentication().AddJwtBearer();
+
+/*builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(
+        "authenticated",
+        policy => policy.RequireAuthenticatedUser()
+    );
+});*/
+
+// This will make all apis require authentication, not sure if this is a good pattern?
+// since there is e.g. the swagger api that does not require authentication?
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -14,7 +56,10 @@ app.UseSwagger();
 app.UseSwaggerUI();
 //}
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
+
+//app.UseAuthentication();
+//app.UseAuthorization();
 
 var summaries = new[]
 {
@@ -35,6 +80,8 @@ app.MapGet("/weatherforecast", () =>
 })
 .WithName("GetWeatherForecast")
 .WithOpenApi();
+
+//app.MapControllers().RequireAuthorization();
 
 app.Run();
 
