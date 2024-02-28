@@ -67,7 +67,7 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 var key = Convert.FromBase64String(builder.Configuration["Jwt:Key"] ?? "");
-app.Logger.LogInformation("Key: {key}", key);
+//app.Logger.LogInformation("Key: {key}", key);
 
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
@@ -90,6 +90,20 @@ IdentityModelEventSource.ShowPII = true;
 
 app.MapGet("/weatherforecast", (HttpContext context, ILogger<Program> logger) =>
 {
+    // Access the request headers
+    var headers = context.Request.Headers;
+
+    // Iterate over the headers and print them
+    foreach (var (key, value) in headers)
+    {
+        // Print each header key and value
+        foreach (var headerValue in value)
+        {
+            logger.LogInformation($"{key}: {headerValue}");
+        }
+    }
+
+    //print claims
     var identity = context.User.Identity as ClaimsIdentity;
     if (identity != null)
     {
