@@ -39,8 +39,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         //ValidateIssuerSigningKey = true,
         //TokenDecryptionKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "")),
-        IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(builder.Configuration["Jwt:Key"] ?? "")),
-        TokenDecryptionKey = new SymmetricSecurityKey(Convert.FromBase64String(builder.Configuration["Jwt:Key"] ?? "")),
+        IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(builder.Configuration["jwtkey"] ?? "")),
+        TokenDecryptionKey = new SymmetricSecurityKey(Convert.FromBase64String(builder.Configuration["jwtkey"] ?? "")),
         ValidateIssuer = false,
         ValidateAudience = false,
         ValidateLifetime = true,
@@ -66,7 +66,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-var key = Convert.FromBase64String(builder.Configuration["Jwt:Key"] ?? "");
+//var key = Convert.FromBase64String(builder.Configuration["Jwt:Key"] ?? "");
+var key = Convert.FromBase64String(builder.Configuration["jwtkey"] ?? "");
 //app.Logger.LogInformation("Key: {key}", key);
 
 // Configure the HTTP request pipeline.
